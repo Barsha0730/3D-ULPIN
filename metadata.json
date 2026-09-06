@@ -1,0 +1,6 @@
+{
+  "name": "3D ULPIN - Urban 3D Property & Land Intelligence",
+  "description": "Next-generation 3D cadastral platform converting conventional 2D land parcels into intelligent 3D property volumes with unique spatial identities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

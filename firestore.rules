@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Cadastral data collections
+    // Public landing page does not read deep cadastral records.
+    // Authenticated users can read cadastral records.
+    // Authorized cadastral officers or admins can write/modify records.
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isCadastralOfficer() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'cadastral_officer' ||
+        request.auth.token.role == 'admin' ||
+        request.auth.token.email.matches('.*@ulpin\\.gov\\.in$')
+      );
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /parcels/{parcelId} {
+      allow read: if true; // Demo records accessible for visualization
+      allow create, update, delete: if isCadastralOfficer();
+    }
+
+    match /buildings/{buildingId} {
+      allow read: if true;
+      allow create, update, delete: if isCadastralOfficer();
+    }
+
+    match /floors/{floorId} {
+      allow read: if true;
+      allow create, update, delete: if isCadastralOfficer();
+    }
+
+    match /properties/{propertyId} {
+      allow read: if true;
+      allow create, update, delete: if isCadastralOfficer();
+    }
+
+    match /ulpins/{ulpinId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated();
+      allow delete: if isCadastralOfficer();
+    }
+
+    match /infrastructure/{infraId} {
+      allow read: if true;
+      allow create, update, delete: if isCadastralOfficer();
+    }
+
+    match /validationResults/{valId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated();
+    }
+
+    match /datasets/{datasetId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isCadastralOfficer();
+    }
+  }
+}
